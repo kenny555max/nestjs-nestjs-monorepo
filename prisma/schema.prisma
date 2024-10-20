@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int      @id @default(autoincrement()) // Primary Key, auto-incremented
+  first_name     String // Optional first name
+  last_name      String // Optional last name
+  phone_number   String? // Optional phone number
+  account_type   String   @default("Individual") // Required account type ("Notary", "Individual", "Business")
+  business_name  String? // Optional business name
+  reg_number     String? // Optional registration number
+  sc_number      String? // Optional security code number
+  office_address String? // Optional office address
+  email          String   @unique // Required email, must be unique
+  password       String // Required password
+  city           String? // Optional city
+  gender         String? // Optional gender ("Male", "Female")
+  verified       String   @default("false")
+  createdAt      DateTime @default(now()) // Automatically set to the current time on record creation
+  updatedAt      DateTime @updatedAt // Automatically updated on record modification
+}

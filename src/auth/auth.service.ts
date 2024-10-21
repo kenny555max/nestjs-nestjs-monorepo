@@ -8,6 +8,8 @@ import Redis from 'ioredis';
 import { ConfigService } from '@nestjs/config';
 import {MailService} from "../mailservice/mailservice.service";
 import {PrismaClient} from "@prisma/client";
+import {JwtPayload, Tokens} from "./interfaces";
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +19,8 @@ export class AuthService {
   constructor(
       private readonly userService: UserService,
       private readonly configService: ConfigService,
-      private readonly mailService: MailService
+      private readonly mailService: MailService,
+      private readonly jwtService: JwtService
   ) {
     // Initialize Redis client
     this.redisClient = new Redis({
@@ -25,6 +28,15 @@ export class AuthService {
       port: this.configService.get('REDIS_PORT'),
       password: this.configService.get('REDIS_PASSWORD'),
     });
+  }
+
+  async loginAccount(req: any): Promise<any>{
+    try{
+      console.log(req);
+      const user = await this.userService.findUserByEmail(req.user.email);
+    }catch(error){
+      ErrorHandler.handleError("Login.Account.Error", error);
+    }
   }
 
   async validateUser({ email, password }: { email: string; password: string }) {
@@ -76,6 +88,30 @@ export class AuthService {
       ErrorHandler.handleError("Register.User", error);
       throw error;
     }
+  }
+
+  /**
+   * Retrieves the access and refresh tokens for the given JWT payload.
+   *
+   * @param {JwtPayload} jwtPayload - The JWT payload containing user information.
+   * @return {Promise<Tokens>} - A promise that resolves to an object with the access and refresh tokens.
+   */
+  async getTokens(jwtPayload: JwtPayload): Promise<Tokens> {
+    const [at, rt] = await Promise.all([
+      this.jwtService.signAsync(jwtPayload, {
+        secret: this.configService.get('jwt.access_token_secret'),
+        expiresIn: this.configService.get('jwt.access_token_expires'),
+      }),
+      this.jwtService.signAsync(jwtPayload, {
+        secret: this.configService.get('jwt.refresh_token_secret'),
+        expiresIn: this.configService.get('jwt.refresh_token_expires'),
+      }),
+    ]);
+
+    return {
+      accessToken: at,
+      refreshToken: rt,
+    };
   }
 
   /**

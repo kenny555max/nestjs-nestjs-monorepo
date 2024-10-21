@@ -7,6 +7,12 @@ export class CreateAuthDto {
     @IsString()
     last_name: string;
 
+    @IsString()
+    accessToken?: string;
+
+    @IsString()
+    refreshToken?: string;
+
     @IsPhoneNumber()
     @IsOptional()
     phone_number: string;

@@ -14,8 +14,8 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('/login')
-  async login(@Request() req){
-    console.log(req.user);
+  async login(@Request() req: any){
+    return await this.authService.loginAccount(req);
   }
 
   @Post("/verify-otp")

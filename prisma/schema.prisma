@@ -22,6 +22,8 @@ model User {
   city           String? // Optional city
   gender         String? // Optional gender ("Male", "Female")
   verified       String   @default("false")
+  access_token   String
+  refresh_token  String
   createdAt      DateTime @default(now()) // Automatically set to the current time on record creation
   updatedAt      DateTime @updatedAt // Automatically updated on record modification
 }

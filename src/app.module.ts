@@ -6,9 +6,15 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { MailserviceModule } from './mailservice/mailservice.module';
 import { ConfigModule } from '@nestjs/config';
+import configuration from "./config/env.config";
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+      envFilePath: '.env',
+    }),
       AuthModule,
     UserModule,
     MailserviceModule,
